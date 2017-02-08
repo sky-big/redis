@@ -2150,8 +2150,8 @@ void initServer() {
     // 适配Redis系统能够打开的文件句柄数量,如果Redis系统设置的上限超过了当前进程的上限，
     // 则以每次16的数量往下设置能够打开的文件上限，直到设置成功
     adjustOpenFilesLimit();
-    server.el = aeCreateEventLoop(server.maxclients+REDIS_EVENTLOOP_FDSET_INCR);
-    server.db = zmalloc(sizeof(redisDb)*server.dbnum);
+    server.el = aeCreateEventLoop(server.maxclients + REDIS_EVENTLOOP_FDSET_INCR);
+    server.db = zmalloc(sizeof(redisDb) * server.dbnum);
 
     /* Open the TCP listening socket for the user commands. */
     // 打开 TCP 监听端口，用于等待客户端的命令请求
@@ -2295,12 +2295,12 @@ void populateCommandTable(void) {
     int j;
 
     // 命令的数量
-    int numcommands = sizeof(redisCommandTable)/sizeof(struct redisCommand);
+    int numcommands = sizeof(redisCommandTable) / sizeof(struct redisCommand);
 
     for (j = 0; j < numcommands; j++) {
 
         // 指定命令
-        struct redisCommand *c = redisCommandTable+j;
+        struct redisCommand *c = redisCommandTable + j;
 
         // 取出字符串 FLAG
         char *f = c->sflags;
@@ -2308,7 +2308,7 @@ void populateCommandTable(void) {
         int retval1, retval2;
 
         // 根据字符串 FLAG 生成实际 FLAG
-        while(*f != '\0') {
+        while (*f != '\0') {
             switch(*f) {
             case 'w': c->flags |= REDIS_CMD_WRITE; break;
             case 'r': c->flags |= REDIS_CMD_READONLY; break;

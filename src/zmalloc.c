@@ -95,7 +95,7 @@ void zlibc_free(void *ptr) {
 // 申请内存成功，然后统计内存使用量
 #define update_zmalloc_stat_alloc(__n) do { \
     size_t _n = (__n); \
-    if (_n&(sizeof(long)-1)) _n += sizeof(long)-(_n&(sizeof(long)-1)); \
+    if (_n & (sizeof(long) - 1)) _n += sizeof(long) - (_n & (sizeof(long) - 1)); \
     if (zmalloc_thread_safe) { \
         update_zmalloc_stat_add(_n); \
     } else { \
@@ -106,7 +106,7 @@ void zlibc_free(void *ptr) {
 // 释放内存成功，然后统计内存使用量
 #define update_zmalloc_stat_free(__n) do { \
     size_t _n = (__n); \
-    if (_n&(sizeof(long)-1)) _n += sizeof(long)-(_n&(sizeof(long)-1)); \
+    if (_n & (sizeof(long) - 1)) _n += sizeof(long) - (_n & (sizeof(long) - 1)); \
     if (zmalloc_thread_safe) { \
         update_zmalloc_stat_sub(_n); \
     } else { \
@@ -134,7 +134,7 @@ static void (*zmalloc_oom_handler)(size_t) = zmalloc_default_oom;
 // 申请size大小的内存(如果没有定义HAVE_MALLOC_SIZE，则需要额外PREFIX_SIZE大小的内存来存储该内存空间的大小，如果
 // 有定义的话，则不需要额外的空间来存储内存空间大小)
 void *zmalloc(size_t size) {
-    void *ptr = malloc(size+PREFIX_SIZE);
+    void *ptr = malloc(size + PREFIX_SIZE);
 
     // 如果没有申请成功，则调用zmalloc_oom_handler句柄处理内存不足的情况
     if (!ptr) zmalloc_oom_handler(size);
@@ -146,15 +146,15 @@ void *zmalloc(size_t size) {
     // 然后将申请的地址去掉统计申请内存大小的PREFIX_SIZE长度返回给调用次函数的对象
 #else
     *((size_t*)ptr) = size;
-    update_zmalloc_stat_alloc(size+PREFIX_SIZE);
-    return (char*)ptr+PREFIX_SIZE;
+    update_zmalloc_stat_alloc(size + PREFIX_SIZE);
+    return (char*)ptr + PREFIX_SIZE;
 #endif
 }
 
 // calloc申请内存空间函数接口
 void *zcalloc(size_t size) {
     // 实际申请空间的动作
-    void *ptr = calloc(1, size+PREFIX_SIZE);
+    void *ptr = calloc(1, size + PREFIX_SIZE);
 
     // 如果没有申请成功，则调用zmalloc_oom_handler句柄处理内存不足的情况
     if (!ptr) zmalloc_oom_handler(size);
@@ -167,8 +167,8 @@ void *zcalloc(size_t size) {
     // 更新used_memory全局变量的大小
 #else
     *((size_t*)ptr) = size;
-    update_zmalloc_stat_alloc(size+PREFIX_SIZE);
-    return (char*)ptr+PREFIX_SIZE;
+    update_zmalloc_stat_alloc(size + PREFIX_SIZE);
+    return (char*)ptr + PREFIX_SIZE;
 #endif
 }
 
@@ -186,7 +186,7 @@ void *zrealloc(void *ptr, size_t size) {
     // 得到老的ptr地址对应的内存空间大小
     oldsize = zmalloc_size(ptr);
     // 调用realloc重新申请内存
-    newptr = realloc(ptr,size);
+    newptr = realloc(ptr, size);
     // 如果申请内存失败，则调用处理句柄函数进行处理
     if (!newptr) zmalloc_oom_handler(size);
 
@@ -197,11 +197,11 @@ void *zrealloc(void *ptr, size_t size) {
     return newptr;
 #else
     // 先得到老的ptr实际的内存起始地址
-    realptr = (char*)ptr-PREFIX_SIZE;
+    realptr = (char*)ptr - PREFIX_SIZE;
     // 得到老的ptr对应的内存空间的大小
     oldsize = *((size_t*)realptr);
     // 调用realloc函数进行内存空间的申请
-    newptr = realloc(realptr,size+PREFIX_SIZE);
+    newptr = realloc(realptr, size + PREFIX_SIZE);
     // 如果申请内存失败，则调用处理句柄函数进行处理
     if (!newptr) zmalloc_oom_handler(size);
 
@@ -212,7 +212,7 @@ void *zrealloc(void *ptr, size_t size) {
     // 将新申请的内存空间大小增加到used_memory变量中
     update_zmalloc_stat_alloc(size);
     // 将实际的内存起始地址返回给调用者
-    return (char*)newptr+PREFIX_SIZE;
+    return (char*)newptr + PREFIX_SIZE;
 #endif
 }
 
@@ -222,12 +222,12 @@ void *zrealloc(void *ptr, size_t size) {
 // redis自定义的统计一个内存地址使用的内存大小(jemalloc,tcmalloc,苹果操作系统这三种内存分配器定义有自己的统计内存大小函数)
 #ifndef HAVE_MALLOC_SIZE
 size_t zmalloc_size(void *ptr) {
-    void *realptr = (char*)ptr-PREFIX_SIZE;
+    void *realptr = (char*)ptr - PREFIX_SIZE;
     size_t size = *((size_t*)realptr);
     /* Assume at least that all the allocations are padded at sizeof(long) by
      * the underlying allocator. */
-    if (size&(sizeof(long)-1)) size += sizeof(long)-(size&(sizeof(long)-1));
-    return size+PREFIX_SIZE;
+    if (size & (sizeof(long) - 1)) size += sizeof(long) - (size & (sizeof(long) - 1));
+    return size + PREFIX_SIZE;
 }
 #endif
 
@@ -248,11 +248,11 @@ void zfree(void *ptr) {
     // 然后释放内存
 #else
     // 得到真实的内存起始地址
-    realptr = (char*)ptr-PREFIX_SIZE;
+    realptr = (char*)ptr - PREFIX_SIZE;
     // 得到内存地址对应的内存大小
     oldsize = *((size_t*)realptr);
     // 将内存大小从used_memory中减去
-    update_zmalloc_stat_free(oldsize+PREFIX_SIZE);
+    update_zmalloc_stat_free(oldsize + PREFIX_SIZE);
     // 释放内存的实际动作
     free(realptr);
 #endif
