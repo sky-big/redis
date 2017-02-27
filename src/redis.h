@@ -295,7 +295,7 @@
 #define REDIS_NOTICE 2
 #define REDIS_WARNING 3
 #define REDIS_LOG_RAW (1<<10) /* Modifier to log without timestamp */
-#define REDIS_DEFAULT_VERBOSITY REDIS_NOTICE
+#define REDIS_DEFAULT_VERBOSITY REDIS_VERBOSE
 
 /* Anti-warning macro... */
 #define REDIS_NOTUSED(V) ((void) V)
@@ -1137,15 +1137,15 @@ struct redisServer {
     // 主服务器发送 PING 的频率
     int repl_ping_slave_period;     /* Master pings the slave every N seconds */
 
-    // backlog 本身
+    // backlog 本身(积压空间指针)
     char *repl_backlog;             /* Replication backlog for partial syncs */
-    // backlog 的长度
+    // backlog 的长度(积压空间预留大小)
     long long repl_backlog_size;    /* Backlog circular buffer size */
-    // backlog 中数据的长度
+    // backlog 中数据的长度(积压空间中写入的新数据的大小)
     long long repl_backlog_histlen; /* Backlog actual data length */
-    // backlog 的当前索引
+    // backlog 的当前索引(下一次向积压空间写入数据的起始位置)
     long long repl_backlog_idx;     /* Backlog circular buffer current offset */
-    // backlog 中可以被还原的第一个字节的偏移量
+    // backlog 中可以被还原的第一个字节的偏移量(积压数据的起始位置，是一个宏观值)
     long long repl_backlog_off;     /* Replication offset of first byte in the
                                        backlog buffer. */
     // backlog 的过期时间

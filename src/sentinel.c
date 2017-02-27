@@ -2824,6 +2824,7 @@ void sentinelPublishReplyCallback(redisAsyncContext *c, void *reply, void *privd
  *
  * 如果消息里面指定的主服务器的名字是未知的，那么这条消息将被丢弃。
  */
+// hello消息的格式是"s_ip,s_port,s_runid,s_epoch,m_name,m_ip,m_port,m_epoch"
 void sentinelProcessHelloMessage(char *hello, int hello_len) {
     /* Format is composed of 8 tokens:
      * 0=ip,1=port,2=runid,3=current_epoch,4=master_name,
@@ -3094,6 +3095,7 @@ void sentinelSendPeriodicCommands(sentinelRedisInstance *ri) {
         (now - ri->info_refresh) > info_period))
     {
         /* Send INFO to masters and slaves, not sentinels. */
+        // 向主服务器和从服务器发送info消息
         retval = redisAsyncCommand(ri->cc,
             sentinelInfoReplyCallback, NULL, "INFO");
         if (retval == REDIS_OK) ri->pending_commands++;

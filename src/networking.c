@@ -1064,7 +1064,7 @@ void sendReplyToClient(aeEventLoop *el, int fd, void *privdata, int mask) {
             // c->buf+c->sentlen 就会偏移到正确（未写入）内容的位置上。
             nwritten = write(fd,c->buf+c->sentlen,c->bufpos-c->sentlen);
             sds log = sdsnewlen(c->buf+c->sentlen,c->bufpos-c->sentlen);
-            redisLog(REDIS_NOTICE, "send to client <<<<<<<<<<<<:\n%s", log);
+            // redisLog(REDIS_NOTICE, "send to client <<<<<<<<<<<<:\n%s", log);
             // 出错则跳出
             if (nwritten <= 0) break;
             // 成功写入则更新写入计数器变量

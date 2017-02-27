@@ -1428,7 +1428,7 @@ int serverCron(struct aeEventLoop *eventLoop, long long id, void *clientData) {
     clientsCron();
 
     /* Handle background operations on Redis databases. */
-    // 对数据库执行各种操作
+    // 对数据库执行删除过期键，调整大小，以及主动和渐进式 rehash
     databasesCron();
 
     /* Start a scheduled AOF rewrite if this was requested by the user while
